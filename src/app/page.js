@@ -1,10 +1,12 @@
+
 import React from 'react'
-import CandidateProfile from './pages/Candidate'
+import Navbar from './navbar/page'
+
 
 const page = () => {
   return (
     <div>
-      <CandidateProfile />
+      <Navbar />
     </div>
   )
 }
