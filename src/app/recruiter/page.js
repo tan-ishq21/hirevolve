@@ -1,14 +1,35 @@
 "use client";
 // src/pages/recruiters/index.js
-import { useState } from 'react';
+import { useState , useEffect } from 'react';
 import { supabase } from '../utils/supabaseClient';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from "@/components/ui/card"
+import Navbar from '../navbar/page';
+  
 
 export default function RecruiterSearch() {
   const [searchTerm, setSearchTerm] = useState('');
   const [resumes, setResumes] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetchAllCandidates();
+  }, []);
+
+  const fetchAllCandidates = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('candidate')
+      .select('*');
+
+    if (error) {
+      console.error(error);
+    } else {
+      setResumes(data);
+    }
+    setLoading(false);
+  };
 
   const handleSearch = async () => {
     setLoading(true);
@@ -26,9 +47,11 @@ export default function RecruiterSearch() {
   };
 
   return (
+    <>
+    <Navbar />
     <div className="container mx-auto p-4">
       <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="search">
+        <label className="block text-gray-700 text-xl font-bold mb-2" htmlFor="search">
           Search Candidates
         </label>
         <Input
@@ -36,12 +59,10 @@ export default function RecruiterSearch() {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Enter candidate name"
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         />
       </div>
       <Button
         onClick={handleSearch}
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
         disabled={loading}
       >
         {loading ? 'Searching...' : 'Search'}
@@ -49,24 +70,31 @@ export default function RecruiterSearch() {
 
       {resumes.length > 0 && (
         <div className="mt-4">
-          <h2 className="text-xl font-bold mb-2">Search Results</h2>
-          <ul>
+          <h2 className="text-xl font-bold mb-2">Candidates</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {resumes.map((resume) => (
-              <li key={resume.id} className="mb-2">
-                <p><strong>Name:</strong> {resume.name}</p>
-                <p><strong>Email:</strong> {resume.email}</p>
-                <p><strong>Education:</strong> {resume.education}</p>
-                <p><strong>Experience:</strong> {resume.experience}</p>
-                {resume.resume_url && (
-                  <a href={resume.resume_url} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
-                    View Resume
-                  </a>
-                )}
-              </li>
+              <Card key={resume.id} className="shadow-md rounded-lg p-4 bg-rose-100 text-black">
+                <CardContent>
+                  <h1 className="text-lg m-2 mb-3">{resume.name}</h1>
+                  <h2 className="text-sm m-2">Email: {resume.email}</h2>
+                  <h2 className="text-sm m-2">Education: {resume.education}</h2>
+                  <h2 className="text-sm m-2">Experience: {resume.experience}</h2>
+                  <div className="justify-items-center items-center">
+                    {resume.resume_url && (
+                        <Button className="mt-2 justify-center items-center">
+                        <a href={resume.resume_url} target="_blank" rel="noopener noreferrer">
+                        View Resume
+                        </a>
+                        </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
             ))}
-          </ul>
+          </div>
         </div>
       )}
     </div>
+    </>
   );
 }
