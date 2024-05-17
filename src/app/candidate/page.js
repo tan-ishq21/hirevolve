@@ -48,7 +48,7 @@ export default function CandidateProfile() {
 
       let { error: uploadError } = await supabase.storage
         .from('resumes')
-        .upload("public" + resume?.name , resume );
+        .upload(filePath , resume );
 
       if (uploadError) {
         console.error(uploadError);
@@ -56,22 +56,22 @@ export default function CandidateProfile() {
         return;
       }
 
-    //   const { publicURL, error: urlError } = supabase.storage
-    //     .from('resumes')
-    //     .getPublicUrl("public" + resume?.name);
+      const { data: { publicUrl }, error: urlError } = supabase.storage
+      .from('resumes')
+      .getPublicUrl(filePath);
 
-    //   if (urlError) {
-    //     console.error(urlError);
-    //     setUploading(false);
-    //     return;
-    //   }
+    if (urlError) {
+      console.error(urlError);
+      setUploading(false);
+      return;
+    }
 
-    //   resumeUrl = publicURL;
+      resumeUrl = publicUrl;
     }
 
     const { error: insertError } = await supabase
       .from('candidate')
-      .insert([{ ...profile }]);
+      .insert([{ ...profile, resume_url: resumeUrl }]);
 
     if (insertError) {
       console.error(insertError);
@@ -81,6 +81,10 @@ export default function CandidateProfile() {
 
     setUploading(false);
   };
+
+  // const addUrlToTable = async (e) => {
+
+  // }
 
   return (
     
