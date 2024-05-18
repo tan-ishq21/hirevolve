@@ -94,7 +94,7 @@ export default function CandidateProfile() {
     <>
     <Navbar />
 
-    <div className="container mx-auto p-4 mt-4">
+    <div className="container mx-auto p-4 bg-gradient-to-r from-purple-300 to-pink-300">
       <h1 className='text-2xl font-semibold mb-3'> Candidate Details</h1>
       <form onSubmit={handleSubmit}>
 
@@ -107,7 +107,6 @@ export default function CandidateProfile() {
             value={profile.name}
             onChange={handleChange}
             type="text"
-            className='focus:bg-rose-100'
             placeholder="Enter your name"
           />
         </div>
@@ -120,7 +119,6 @@ export default function CandidateProfile() {
             value={profile.email}
             onChange={handleChange}
             type="email"
-            className='focus:bg-rose-100'
             placeholder="Enter your email"
           />
         </div>
@@ -133,7 +131,6 @@ export default function CandidateProfile() {
             value={profile.education}
             onChange={handleChange}
             type="text"
-            className='focus:bg-rose-100'
             placeholder="Enter your education"
           />
         </div>
@@ -146,7 +143,6 @@ export default function CandidateProfile() {
             value={profile.experience}
             onChange={handleChange}
             type="text"
-            className='focus:bg-rose-100'
             placeholder="Enter your experience (in years)"
           />
         </div>
@@ -159,7 +155,6 @@ export default function CandidateProfile() {
             value={profile.linkedin}
             onChange={handleChange}
             type="text"
-            className='focus:bg-rose-100'
             placeholder="Enter your Linkedin URL"
           />
         </div>

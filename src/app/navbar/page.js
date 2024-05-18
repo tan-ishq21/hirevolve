@@ -1,19 +1,52 @@
 "use client";
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from '../utils/supabaseClient';
+import { useRouter } from 'next/navigation';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const router = useRouter();
 
   const toggleNavbar = () => {
     setIsOpen(!isOpen);
+  };
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setIsAuthenticated(true);
+      }
+    };
+
+    checkUser();
+  }, []);
+
+  const handleRecruiterClick = () => {
+    if (isAuthenticated) {
+      router.push('/recruiter');
+    } else {
+      router.push('/signup');
+    }
+  };
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (!error) {
+      setIsAuthenticated(false);
+      router.push('/login');
+    } else {
+      console.error('Error logging out:', error.message);
+    }
   };
 
   return (
     <nav className="border-gray-200 bg-rose-100 dark:bg-gray-800 dark:border-gray-700">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
         <a href="#" className="flex items-center space-x-3 rtl:space-x-reverse">
-          <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Hirevolve</span>
+          <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">RecruitHive</span>
         </a>
         <button 
           data-collapse-toggle="navbar-hamburger" 
@@ -37,8 +70,23 @@ const Navbar = () => {
               <Link href="/candidate" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">Candidate Page</Link>
             </li>
             <li>
-              <Link href="/recruiter" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white">Recruiter Page</Link>
+              <button
+                onClick={handleRecruiterClick}
+                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white"
+              >
+                Recruiter Page
+              </button>
             </li>
+            {isAuthenticated && (
+              <li>
+                <button
+                  onClick={handleLogout}
+                  className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white"
+                >
+                  Logout
+                </button>
+              </li>
+            )}
           </ul>
         </div>
       </div>

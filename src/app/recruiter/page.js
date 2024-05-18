@@ -6,16 +6,39 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from "@/components/ui/card"
 import Navbar from '../navbar/page';
+import { useAuthStore } from '../store/auth';
+import { useRouter } from 'next/navigation';
   
 
 export default function RecruiterSearch() {
+
+  const [setting, setSetting] = useState(true);
+  const [authenticated, setAuthenticated] = useState(false);
+  const router = useRouter();
+
   const [searchTerm, setSearchTerm] = useState('');
   const [resumes, setResumes] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetchAllCandidates();
-  }, []);
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setAuthenticated(true);
+      } else {
+        router.push('/login');
+      }
+      setSetting(false);
+    };
+
+    checkUser();
+  }, [router]);
+
+  useEffect(() => {
+    if (authenticated) {
+      fetchAllCandidates();
+    }
+  }, [authenticated]);
 
   const fetchAllCandidates = async () => {
     setLoading(true);
@@ -46,10 +69,18 @@ export default function RecruiterSearch() {
     setLoading(false);
   };
 
+  if (setting) {
+    return <div>Loading...</div>;
+  }
+
+  if (!authenticated) {
+    return null;
+  }
+
   return (
     <>
     <Navbar />
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 bg-gradient-to-r from-purple-300 to-pink-300">
       <div className="mb-4">
         <label className="block text-gray-700 text-xl font-bold mb-2" htmlFor="search">
           Search Candidates
